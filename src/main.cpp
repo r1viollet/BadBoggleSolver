@@ -8,6 +8,8 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include <stdio.h>  /* printf, fgets */
+#include <stdlib.h> /* atoi */
 #include <string>
 
 //#define DEBUG
@@ -16,14 +18,20 @@ namespace tng {
 constexpr int kDefaultComputationTimeInSecs = 30;
 
 int main(int argc, char *argv[]) {
+  int runDuration = kDefaultComputationTimeInSecs;
+
+  if (argc >= 2) {
+    int runDuration = atoi(argv[1]); // don't actually use atoi ;-)
+    std::cerr << "Override run duration to : " << runDuration << std::endl;
+  }
+
   TimePoint t1 = GetTimePoint();
-  unsigned seed = 0; // for a more random behaviour --> time(NULL)
+  unsigned counter = 0; // for a more random behaviour --> time(NULL)
   int nbWordsFound = 0;
   // Loop for 30 seconds to allow profiling
-  while (GetTimeFrom<TimeInS>(t1).count() < kDefaultComputationTimeInSecs) {
+  while (GetTimeFrom<TimeInS>(t1).count() < runDuration) {
     /* Create dictionary */
-    // This is a voluntary mistake : we want people to notice that we are
-    // recreating the dictionary in a loop
+    // Should this be in the loop or outside ? ;-)
     std::string pathWords = TNG_DATA_PATH;
     pathWords += "words_reduced.txt";
     std::ifstream fs(pathWords);
@@ -31,7 +39,7 @@ int main(int argc, char *argv[]) {
 
     /* Create grid : todo a better create function would make it more likely to
      * find words */
-    tng::Boggle::GridChar grid = tng::Boggle::RandomFactory(seed);
+    tng::Boggle::GridChar grid = tng::Boggle::RandomFactory(counter);
 #ifdef DEBUG
     tng::Boggle::operator<<(std::cerr, grid);
 #endif
@@ -46,9 +54,10 @@ int main(int argc, char *argv[]) {
       std::cerr << w << std::endl;
     }
 #endif
-    ++seed;
+    ++counter;
   }
-  std::cerr << argv[0] << "found " << nbWordsFound << std::endl;
+  std::cerr << "nbComputations=" << counter << std::endl;
+  std::cerr << "nbWords=" << nbWordsFound << std::endl;
   return 0;
 }
 } // namespace tng
