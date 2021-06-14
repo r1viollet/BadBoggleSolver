@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   int runDuration = kDefaultComputationTimeInSecs;
 
   if (argc >= 2) {
-    int runDuration = atoi(argv[1]); // don't actually use atoi ;-)
+    runDuration = atoi(argv[1]); // don't actually use atoi ;-)
     std::cerr << "Override run duration to : " << runDuration << std::endl;
   }
 
