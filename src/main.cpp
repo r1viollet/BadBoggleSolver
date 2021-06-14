@@ -24,18 +24,18 @@ int main(int argc, char *argv[]) {
     runDuration = atoi(argv[1]); // don't actually use atoi ;-)
     std::cerr << "Override run duration to : " << runDuration << std::endl;
   }
+  /* Create dictionary */
+  // Should this be in the loop or outside ? ;-)
+  std::string pathWords = TNG_DATA_PATH;
+  pathWords += "words_reduced.txt";
+  std::ifstream fs(pathWords);
+  tng::WordDict words(fs);
 
   TimePoint t1 = GetTimePoint();
   unsigned counter = 0; // for a more random behaviour --> time(NULL)
   int nbWordsFound = 0;
   // Loop for 30 seconds to allow profiling
   while (GetTimeFrom<TimeInS>(t1).count() < runDuration) {
-    /* Create dictionary */
-    // Should this be in the loop or outside ? ;-)
-    std::string pathWords = TNG_DATA_PATH;
-    pathWords += "words_reduced.txt";
-    std::ifstream fs(pathWords);
-    tng::WordDict words(fs);
 
     /* Create grid : todo a better create function would make it more likely to
      * find words */
