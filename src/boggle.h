@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <limits>
 #include <vector>
 
 namespace tng {

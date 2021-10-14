@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(BadBoggleSolver)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 
 add_compile_definitions("TNG_DATA_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"")
 
@@ -15,4 +15,3 @@ option(BUILD_DDPROF_TESTING "Enable tests" OFF)
 if (${BUILD_DDPROF_TESTING})
   add_subdirectory(tst)
 endif()
-
