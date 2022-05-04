@@ -5,6 +5,7 @@
 #include "time_helpers.h"
 #include "worddict.h"
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -26,7 +27,9 @@ struct InputValues {
 };
 
 void PrintHelp(std::string exe) {
-  std::cerr << "This is a toy app to generate work." << std::endl;
+  std::cerr << "This is a toy app to generate work. It expects a data folder "
+               "in ../data"
+            << std::endl;
   std::cerr << std::endl;
   std::cerr << "Example of usage:" << std::endl;
   std::cerr << "      " << exe << " time nb_seconds" << std::endl;
@@ -80,6 +83,7 @@ bool TimeToStop(const InputValues &inputValues, const TimePoint &startTime,
   }
   if (inputValues._nbComputations != -1 &&
       nbComputations >= inputValues._nbComputations) {
+    std::cerr << "timeInMs=" << timeInMs.count() << std::endl;
     return true;
   }
   if (inputValues._runDuration != -1 &&
@@ -90,15 +94,7 @@ bool TimeToStop(const InputValues &inputValues, const TimePoint &startTime,
 }
 
 int main(int argc, char *argv[]) {
-  int runDuration = kDefaultComputationTimeInSecs;
-
   InputValues inputValues = GetInputValues(argc, argv);
-
-  if (argc >= 2) {
-    runDuration = atoi(argv[1]); // don't actually use atoi ;-)
-    std::cerr << "Override run duration to : " << runDuration << std::endl;
-  }
-
   TimePoint t1 = GetTimePoint();
   unsigned counter = 0; // for a more random behaviour --> time(NULL)
   int nbWordsFound = 0;
@@ -106,9 +102,17 @@ int main(int argc, char *argv[]) {
   while (!TimeToStop(inputValues, t1, counter)) {
     /* Create dictionary */
     // This is done to ensure we reload words at every cycle
-    std::string pathWords = TNG_DATA_PATH;
-    pathWords += "words_reduced.txt";
-    std::ifstream fs(pathWords);
+    // File read is somewhat important for profiling
+    std::filesystem::path binPath = argv[0];
+    std::filesystem::path dataPath = binPath.remove_filename();
+    dataPath /= "../data";
+    dataPath /= "words_reduced.txt";
+    std::ifstream fs(dataPath);
+    if (!fs.good()) {
+      std::cerr << "Could not find data for words in " << dataPath << std::endl;
+      std::cerr << "Check install / build config" << std::endl;
+      exit(1);
+    }
     tng::WordDict words(fs);
 
     /* Create grid : todo a better create function would make it more likely
