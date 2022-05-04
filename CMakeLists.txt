@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(BadBoggleSolver)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
-add_compile_definitions("TNG_DATA_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"")
 
 ## Frame pointers
 set(FRAME_PTR_FLAG_YES "-fno-omit-frame-pointer")
@@ -21,6 +20,12 @@ endif()
 
 add_compile_options(-Werror=sign-compare)
 add_compile_options(-fPIC)
+
+# Make data accessible in build
+add_custom_target(copy-data-files ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/data)
+# Make data accessible in install path
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/data/words_reduced.txt" DESTINATION data)
 
 include_directories(src)
 add_subdirectory(src)
