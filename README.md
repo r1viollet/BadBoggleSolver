@@ -1,6 +1,7 @@
-# TrainingExersises
+# Bad boggle solver
 
-Small c++ application that creates and solves boggles.
+Toy program to generate a workload to test Datadog apps.
+It also solves boggles.
 
 ## Retrieving english words
 
