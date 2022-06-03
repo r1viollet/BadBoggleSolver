@@ -13,6 +13,9 @@
 #include <stdlib.h> /* atoi */
 #include <string>
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
 //#define DEBUG
 
 namespace tng {
@@ -103,8 +106,19 @@ int main(int argc, char *argv[]) {
     /* Create dictionary */
     // This is done to ensure we reload words at every cycle
     // File read is somewhat important for profiling
-    std::filesystem::path binPath = argv[0];
-    std::filesystem::path dataPath = binPath.remove_filename();
+#ifdef __APPLE__
+    char path[1024];
+    uint32_t size = sizeof(path);
+    if (_NSGetExecutablePath(path, &size) != 0) {
+      std::cerr << "Failure to write exe path" << std::endl;
+      exit(1);
+    }
+    std::filesystem::path exe = std::filesystem::canonical(path);
+#else
+    std::filesystem::path exe = std::filesystem::canonical("/proc/self/exe");
+#endif
+    std::filesystem::path dataPath = exe.remove_filename();
+
     dataPath /= "../data";
     dataPath /= "words_reduced.txt";
     std::ifstream fs(dataPath);
