@@ -12,6 +12,8 @@
 #include <stdio.h>  /* printf, fgets */
 #include <stdlib.h> /* atoi */
 #include <string>
+#include <signal.h>
+
 
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
@@ -23,10 +25,11 @@ constexpr int kDefaultComputationTimeInSecs = 30;
 
 struct InputValues {
   InputValues() : _runDuration(-1), _nbComputations(-1){};
-  InputValues(int runDuration, int nbComputations)
-      : _runDuration(runDuration), _nbComputations(nbComputations){};
+  InputValues(int runDuration, int nbComputations, int crash = 3)
+      : _runDuration(runDuration), _nbComputations(nbComputations), _crash_at_end(crash) {};
   int _runDuration;
   int _nbComputations;
+  int _crash_at_end;
 };
 
 void PrintHelp(std::string exe) {
@@ -37,10 +40,30 @@ void PrintHelp(std::string exe) {
   std::cerr << "Example of usage:" << std::endl;
   std::cerr << "      " << exe << " time nb_seconds" << std::endl;
   std::cerr << "      " << exe << " work nb_seconds" << std::endl;
+  std::cerr << "      " << exe << " crash type_of_crash" << std::endl;
   std::cerr << "      " << exe << " nb_seconds" << std::endl;
-  std::cerr << "      "
+  std::cerr << "      ";
+  std::cerr << "Types of crash  ";
+  std::cerr << "    - SIGSEGV";
+  std::cerr << "    - abort";
+  std::cerr << "    - exception";
+  std::cerr << ""
             << "Defaults to a run of " << kDefaultComputationTimeInSecs
-            << "seconds with no arguments" << std::endl;
+            << "seconds with no arguments" << std::endl
+            << "Crash happens after 3 seconds of work" << std::endl;
+
+}
+
+void do_crash(int crash_type){
+  if (crash_type == 1) {
+    raise(SIGSEGV);
+  }
+  else if (crash_type == 2) {
+    abort();
+  }
+  else if (crash_type == 3) {
+    throw std::exception();
+  }
 }
 
 InputValues GetInputValues(int argc, char *argv[]) {
@@ -66,6 +89,8 @@ InputValues GetInputValues(int argc, char *argv[]) {
       return InputValues(argValue, -1);
     } else if (std::string(argv[1]) == "work") {
       return InputValues(-1, argValue);
+    } else if (std::string(argv[1]) == "crash") {
+      return InputValues(3, -1, argValue);
     }
   }
   PrintHelp(std::string(argv[0]));
@@ -150,6 +175,8 @@ int main(int argc, char *argv[]) {
   }
   std::cerr << "nbComputations=" << counter << std::endl;
   std::cerr << "nbWords=" << nbWordsFound << std::endl;
+  
+  do_crash(inputValues._crash_at_end);
   return 0;
 }
 } // namespace tng
