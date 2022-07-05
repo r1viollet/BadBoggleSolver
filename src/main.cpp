@@ -25,8 +25,8 @@ constexpr int kDefaultComputationTimeInSecs = 30;
 
 struct InputValues {
   InputValues() : _runDuration(-1), _nbComputations(-1){};
-  InputValues(int runDuration, int nbComputations, int crash = 3)
-      : _runDuration(runDuration), _nbComputations(nbComputations), _crash_type(crash) {};
+  InputValues(int runDuration, int nbComputations, int crash_type = 0)
+      : _runDuration(runDuration), _nbComputations(nbComputations), _crash_type(crash_type) {};
   int _runDuration;
   int _nbComputations;
   int _crash_type;
@@ -38,10 +38,10 @@ void PrintHelp(std::string exe) {
             << std::endl;
   std::cerr << std::endl;
   std::cerr << "Example of usage:" << std::endl;
-  std::cerr << "      " << exe << " time nb_seconds" << std::endl;
-  std::cerr << "      " << exe << " work nb_seconds" << std::endl;
-  std::cerr << "      " << exe << " crash crash_type_num" << std::endl;
-  std::cerr << "      " << exe << " nb_seconds" << std::endl;
+  std::cerr << "      " << exe << " time <nb_seconds>" << std::endl;
+  std::cerr << "      " << exe << " work <nb_seconds>" << std::endl;
+  std::cerr << "      " << exe << " crash <crash_type_num>" << std::endl;
+  std::cerr << "      " << exe << " <nb_seconds>" << std::endl;
   std::cerr << "      ";
   std::cerr << "Types of crash";
   std::cerr << "    - 1 --> SIGSEGV";
